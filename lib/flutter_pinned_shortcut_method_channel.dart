@@ -15,12 +15,14 @@ class MethodChannelFlutterPinnedShortcut extends FlutterPinnedShortcutPlatform {
     required String label,
     required String action,
     String? iconAssetName,
+    String? iconUri
   }) async {
     return await methodChannel.invokeMethod("createPinnedShortcut", {
       "id": id,
       "shortLabel": label,
       "action": action,
       "icon": iconAssetName,
+      "iconUri": iconUri
     });
   }
 

@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
+import android.net.Uri;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
@@ -83,6 +84,7 @@ public class PinnedShortcutUtil {
 
         final String id = (String) shortcut.get("id");
         final String icon = (String) shortcut.get("icon");
+        final String iconUri = (String) shortcut.get("iconUri");
         final String action = (String) shortcut.get("action");
 
         // Short Label for the shortcut
@@ -93,7 +95,7 @@ public class PinnedShortcutUtil {
         final int iconType = 1;
 
         ShortcutInfoCompat.Builder shortcutInfoCompat = buildShortcutUsingCompat(
-                id, icon, action, shortLabel, iconType);
+                id, icon, iconUri, action, shortLabel, iconType);
 
         return shortcutInfoCompat.build();
 
@@ -101,7 +103,7 @@ public class PinnedShortcutUtil {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private ShortcutInfoCompat.Builder buildShortcutUsingCompat(
-            String id, String icon, String action, String shortLabel, int iconType) {
+            String id, String icon, String iconUri, String action, String shortLabel, int iconType) {
 
         assert id != null;
         ShortcutInfoCompat.Builder shortcutInfoCompat = new ShortcutInfoCompat.Builder(context, id);
@@ -115,6 +117,8 @@ public class PinnedShortcutUtil {
 
         if (icon != null) {
             setIconFromFlutterCompat(shortcutInfoCompat, icon);
+        } else if (iconUri != null) {
+            setIconFromUri(shortcutInfoCompat, iconUri);
         }
 
         if (shortLabel != null) {
@@ -128,6 +132,12 @@ public class PinnedShortcutUtil {
     private void setIconFromFlutterCompat(ShortcutInfoCompat.Builder shortcutBuilder, String icon) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             shortcutBuilder.setIcon(IconCompat.createFromIcon(context, getIconFromFlutterAsset(context, icon)));
+        }
+    }
+
+    private void setIconFromUri(ShortcutInfoCompat.Builder shortcutBuilder, String iconUri) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            shortcutBuilder.setIcon(IconCompat.createFromIcon(context, getIconFromUri(context, iconUri)));
         }
     }
 
@@ -152,6 +162,19 @@ public class PinnedShortcutUtil {
         return Icon.createWithAdaptiveBitmap(image);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private Icon getIconFromUri(Context context, String uriString) {
+        Bitmap image = null;
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 4;
+            Uri uri = Uri.parse(uriString);
+            image = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri), null, options);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Icon.createWithAdaptiveBitmap(image);
+    }
 
     private Intent getIntentToOpenMainActivity(String type) {
         final String packageName = context.getPackageName();

@@ -6,12 +6,14 @@ class FlutterPinnedShortcut {
     required String label,
     required String action,
     String? iconAssetName,
+    String? iconUri
   }) {
     return FlutterPinnedShortcutPlatform.instance.createPinnedShortcut(
       id: id,
       label: label,
       action: action,
       iconAssetName: iconAssetName,
+      iconUri: iconUri
     );
   }
 

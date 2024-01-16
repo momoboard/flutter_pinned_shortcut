@@ -29,6 +29,7 @@ abstract class FlutterPinnedShortcutPlatform extends PlatformInterface {
     required String label,
     required String action,
     String? iconAssetName,
+    String? iconUri,
   }) async {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
